@@ -1,0 +1,15 @@
+Alias Generator
+
+usage: aliasgen.py [-h] --path PATH [--destination DESTINATION] [--console]
+                   [--levels LEVELS] [--text-editor TEXT_EDITOR]
+                   [--media-editor MEDIA_EDITOR]
+
+Generate path and file bash and zhrc compatible aliases from a specific path.
+
+  -h, --help                    show this help message and exit
+  --path PATH                   Path to target
+  --destination DESTINATION     Generate file with aliases
+  --console                     Print aliases statements to the console
+  --levels LEVELS               Maximum paths to transverse
+  --text-editor TEXT_EDITOR     Set text editor
+  --media-editor MEDIA_EDITOR   Set media editor
