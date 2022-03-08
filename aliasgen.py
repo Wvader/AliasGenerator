@@ -4,29 +4,46 @@ import pathlib
 import random
 from os import walk
 
+
+# default text editor for unix
 TEXT_EDITOR = "less"
-MEDIA_EDITOR = "open"
+
+# Use open for mac os; Use None to deactivate
+DEFAULT_EDITOR = "open"
+
 
 parser = argparse.ArgumentParser(
     prog='aliasgen.py',
-    description='Generate path and file aliases recursively from a specific path'
+    description='Aliases Generator '
+                '- A random name is generated for the aliases file.'
+                '- Specify the levels the script should walk with --levels'
+                'by default it has no limit.'
 )
 
-parser.add_argument('--path', help='Path to target', type=pathlib.Path, required=True)
+
+parser.add_argument('--path', help='Folder to target', type=pathlib.Path, required=True)
 parser.add_argument('--destination', help='Generate file with aliases', type=pathlib.Path)
 parser.add_argument('--console', help='Print aliases statements to the console', action="store_true")
 parser.add_argument('--levels', help='Levels to walk', type=int, required=False)
-parser.add_argument('--text-editor', help='Set text editor', type=int, required=False)
+parser.add_argument('--text-editor', help='Set text editor', type=str, required=False)
 parser.add_argument('--media-editor', help='Set media editor', type=int, required=False)
 
 commandArgs = parser.parse_args()
 
 unix_path = str(commandArgs.path)
+
+if commandArgs.text_editor is not None:
+    TEXT_EDITOR = commandArgs.text_editor
+
+if commandArgs.default_editor is not None:
+    DEFAULT_EDITOR = commandArgs.default_editor
+
 levels = commandArgs.levels
 
 PATH_SEPARATOR = commandArgs.path.anchor
 
 dataFiles = []
+
 alias_bash_statements = []
 
 inital_path_sep_count = unix_path.count(PATH_SEPARATOR)
@@ -109,6 +126,7 @@ def extract_path_alias(dir_path):
 
     if not has_hidden_contents(alias_path):
         alias_bash_statement = "alias '" + alias_path + "'='cd " + dir_path + "'"
+        alias_bash_statement += '\n'
         alias_bash_statements.append(alias_bash_statement)
 
 
@@ -123,11 +141,15 @@ def extract_files_aliases(dir_path, filenames):
             file_path = dir_path + PATH_SEPARATOR + file
 
             if file_is_text(file_path):
-                alias_bash_statement = "alias '" + file_alias_command + "'='" + TEXT_EDITOR + " " + file_path + "'"
-            else:
-                alias_bash_statement = "alias '" + file_alias_command + "'='" + MEDIA_EDITOR + " " + file_path + "'"
+                alias_bash_statement = "alias '" + file_alias_command + "'='" + TEXT_EDITOR + " " + file_path + "'\n"
+                add_alias(alias_bash_statement)
+            elif DEFAULT_EDITOR is not None:
+                alias_bash_statement = "alias '" + file_alias_command + "'='" + DEFAULT_EDITOR + " " + file_path + "'\n"
+                add_alias(alias_bash_statement)
 
-            alias_bash_statements.append(alias_bash_statement)
+
+def add_alias(alias_bash_statement):
+    alias_bash_statements.append(alias_bash_statement)
 
 
 def print_bash_statements():
